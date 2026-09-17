@@ -1,0 +1,14 @@
+# Dependencias de Node
+node_modules/
+**/node_modules/
+
+# Build y archivos temporales de React / Vite
+dist/
+.vite/
+**/.vite/
+
+# Datos persistentes de Docker / PostgreSQL
+postgres_data/
+
+# Variables de entorno locales
+.env

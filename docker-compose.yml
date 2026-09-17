@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tablero_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: ./backend
+    container_name: backend_express
+    ports:
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/tablero_db
+      - JWT_SECRET=clave_secreta_jwt_prueba_tecnica_2026
+    depends_on:
+      - db
+
+  lambda_metrics:
+    build: ./lambda
+    container_name: lambda_metrics_local
+    ports:
+      - "5001:5001"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/tablero_db
+    depends_on:
+      - db
+
+  frontend:
+    build: ./tablero-notas
+    container_name: frontend_react
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+      - lambda_metrics
+
+volumes:
+  postgres_data:
